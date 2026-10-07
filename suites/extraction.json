@@ -1,0 +1,175 @@
+{
+  "suite": "extraction",
+  "version": 1,
+  "description": "Pull facts out of short synthetic documents supplied in the prompt.",
+  "tasks": [
+    {
+      "id": "extract-001",
+      "title": "Count error lines",
+      "prompt": "Count the lines whose level is ERROR in this log. Reply with only a JSON object like {\"errors\": 0}.\n\n2026-03-14 09:00:01 INFO  worker started\n2026-03-14 09:00:07 WARN  queue depth high\n2026-03-14 09:01:12 ERROR upload failed (timeout)\n2026-03-14 09:01:15 INFO  retrying upload\n2026-03-14 09:02:40 ERROR upload failed (timeout)\n2026-03-14 09:03:02 INFO  upload ok\n2026-03-14 09:04:55 ERROR checksum mismatch\n2026-03-14 09:05:00 INFO  worker idle",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "json_field",
+          "path": "errors",
+          "equals": 3
+        }
+      ],
+      "rubric": "Exactly 3 ERROR lines. The reply should be a JSON object.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-002",
+      "title": "Invoice fields",
+      "prompt": "From the invoice below return JSON with the keys invoice (string), date (YYYY-MM-DD string) and total (number). JSON only.\n\nINVOICE INV-2041\nIssued: 2026-03-14\nBill to: Harbor Supply Co.\nItems: 4 x crate liner @ 52.50, 2 x pallet strap @ 136.25\nAmount due: 482.50 USD",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "json_field",
+          "path": "invoice",
+          "equals": "INV-2041"
+        },
+        {
+          "type": "json_field",
+          "path": "date",
+          "equals": "2026-03-14"
+        },
+        {
+          "type": "json_field",
+          "path": "total",
+          "equals": 482.5
+        }
+      ],
+      "rubric": "invoice INV-2041, date 2026-03-14, total 482.5. Score down any extra invented fields only mildly.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-003",
+      "title": "Who accepted",
+      "prompt": "List the teams that accepted the invite, separated by commas, and nothing else.\n\nReplies to the planning invite:\nCedar - accepted\nMaple - declined\nBirch - accepted\nWillow - tentative\nSpruce - accepted\nAlder - declined",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "contains",
+          "value": "Cedar"
+        },
+        {
+          "type": "contains",
+          "value": "Birch"
+        },
+        {
+          "type": "contains",
+          "value": "Spruce"
+        },
+        {
+          "type": "not_contains",
+          "value": "Maple"
+        },
+        {
+          "type": "not_contains",
+          "value": "Willow"
+        },
+        {
+          "type": "not_contains",
+          "value": "Alder"
+        }
+      ],
+      "rubric": "Exactly Cedar, Birch and Spruce.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-004",
+      "title": "Earliest deadline",
+      "prompt": "Which task has the earliest deadline? Give the task name and its date.\n\nTask deadlines:\n- Draft report: 2026-05-20\n- Review budget: 2026-04-08\n- Ship update: 2026-06-01\n- Book venue: 2026-04-30",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)review budget"
+        },
+        {
+          "type": "contains",
+          "value": "2026-04-08"
+        }
+      ],
+      "rubric": "Review budget on 2026-04-08.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-005",
+      "title": "Highest stock",
+      "prompt": "Which product has the most stock, and how many units? \n\nproduct,stock\nwidget,140\ngasket,95\nbracket,310\nvalve,205",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)bracket"
+        },
+        {
+          "type": "number_close",
+          "expect": 310,
+          "tol": 0.01
+        }
+      ],
+      "rubric": "bracket with 310 units.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-006",
+      "title": "Highest version",
+      "prompt": "Which is the highest version number? Compare the numeric parts, not the text. Installed builds: 1.9.3, 1.10.0, 1.2.12, 1.9.30",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "1\\.10\\.0"
+        },
+        {
+          "type": "not_regex",
+          "pattern": "(?i)highest[^.]*1\\.9\\.30"
+        }
+      ],
+      "rubric": "Semantic ordering gives 1.10.0 as highest. 1.9.30 is lower because 9 < 10 in the second part.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-007",
+      "title": "Distinct tags",
+      "prompt": "How many distinct tags are in this list? alpha, beta, alpha, gamma, beta, delta, alpha",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "\\b4\\b"
+        }
+      ],
+      "rubric": "alpha, beta, gamma, delta gives 4.",
+      "weight": 1.0
+    },
+    {
+      "id": "extract-008",
+      "title": "Config to JSON",
+      "prompt": "Convert this configuration into one JSON object, using numbers and booleans where they apply. JSON only.\n\nretries=3\ntimeout=30\ndebug=false",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "json_field",
+          "path": "retries",
+          "equals": 3
+        },
+        {
+          "type": "json_field",
+          "path": "timeout",
+          "equals": 30
+        },
+        {
+          "type": "json_field",
+          "path": "debug",
+          "equals": false
+        }
+      ],
+      "rubric": "retries 3 (number), timeout 30 (number), debug false (boolean).",
+      "weight": 1.0
+    }
+  ]
+}

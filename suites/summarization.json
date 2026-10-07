@@ -1,0 +1,185 @@
+{
+  "suite": "summarization",
+  "version": 1,
+  "description": "Summarize, rewrite and compare short synthetic passages without inventing facts.",
+  "tasks": [
+    {
+      "id": "summ-001",
+      "title": "One sentence summary",
+      "prompt": "Summarize this in one sentence of at most 30 words.\n\nThe Eastside branch library will change its hours starting in June. It will open at 10 a.m. instead of 9 a.m. on weekdays, stay open until 8 p.m. on Thursdays, and add Saturday hours from 10 a.m. to 2 p.m. The Sunday closure continues. Staff said the new schedule follows a survey in which most visitors asked for weekend access.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "max_words",
+          "value": 30
+        },
+        {
+          "type": "contains",
+          "value": "Saturday"
+        }
+      ],
+      "rubric": "Mentions the new hours (including Saturday opening) and stays within 30 words without invented facts.",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-002",
+      "title": "Action items",
+      "prompt": "List the action items from these notes as bullets, one per team, naming the team.\n\nPlanning meeting notes. Team Cedar will finalize the budget draft by Friday. Team Maple needs to confirm the venue booking before the end of the month. Team Birch is waiting on legal and will send the contract once it arrives. Everyone agreed the launch date stays unchanged.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "contains",
+          "value": "Cedar"
+        },
+        {
+          "type": "contains",
+          "value": "Maple"
+        },
+        {
+          "type": "contains",
+          "value": "Birch"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)budget"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)venue"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)contract"
+        }
+      ],
+      "rubric": "Three action items matching Cedar budget, Maple venue, Birch contract. The unchanged launch date is not an action item.",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-003",
+      "title": "No invented figures",
+      "prompt": "Summarize this announcement in two sentences. Use only facts that are in the text.\n\nThe town council approved the restoration of the harbor lighthouse. The project will cost $2.4 million and is expected to take 18 months. Funding comes from a state heritage grant and a local fundraising campaign. Work includes repairing the stone base, replacing the lantern room glass, and installing a new lamp.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "contains",
+          "value": "2.4 million"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)18 months"
+        },
+        {
+          "type": "not_contains",
+          "value": "2.5"
+        },
+        {
+          "type": "not_contains",
+          "value": "20 months"
+        }
+      ],
+      "rubric": "Two sentences; cost $2.4 million and 18 months must be right; no invented numbers.",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-004",
+      "title": "Short headline",
+      "prompt": "Write a headline of at most 10 words for this report.\n\nEngineers inspecting the old river bridge found cracked support beams near the east pier. The bridge stays open to pedestrians but closes to trucks until repairs finish next spring.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "max_words",
+          "value": 10
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)bridge"
+        }
+      ],
+      "rubric": "A headline within 10 words about the bridge cracks or truck closure.",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-005",
+      "title": "Main drawback",
+      "prompt": "What is the main drawback of the site described here? Answer in one short sentence.\n\nThe new warehouse site has cheap rent and good highway access. Its main drawback is that it sits on a floodplain, so insurance costs are high and the ground floor may be unusable after heavy rain.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)flood"
+        }
+      ],
+      "rubric": "Floodplain location (high insurance, possible unusable ground floor).",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-006",
+      "title": "Plain English rewrite",
+      "prompt": "Rewrite this sentence in plain English in at most 25 words, without the word 'synergies'.\n\nWe will leverage cross-functional synergies to operationalize a scalable paradigm shift in stakeholder engagement.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "max_words",
+          "value": 25
+        },
+        {
+          "type": "min_words",
+          "value": 6
+        },
+        {
+          "type": "not_contains",
+          "value": "synergies",
+          "flags": "i"
+        },
+        {
+          "type": "not_contains",
+          "value": "paradigm",
+          "flags": "i"
+        }
+      ],
+      "rubric": "Plain wording that keeps the meaning (teams working together to change how they engage stakeholders).",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-007",
+      "title": "Conflicting sources",
+      "prompt": "Do these two statements agree? Answer in one or two sentences.\n\nMemo A says the review is on March 3. Memo B says the review is on March 10. Both memos are dated this week.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)conflict|differ|disagree|inconsisten|do not agree|don't agree|not agree"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)march 3"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)march 10"
+        }
+      ],
+      "rubric": "They conflict: March 3 versus March 10. The answer should say so and not pick one without evidence.",
+      "weight": 1.0
+    },
+    {
+      "id": "summ-008",
+      "title": "Tiny TL;DR",
+      "prompt": "Give a TL;DR of at most 15 words, keeping the percentage.\n\nOnline orders rose 40% in the second quarter, driven mostly by the new mobile app, while in-store sales stayed flat.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "max_words",
+          "value": 15
+        },
+        {
+          "type": "contains",
+          "value": "40%"
+        }
+      ],
+      "rubric": "Orders up 40% from the mobile app; in-store flat.",
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "suite": "reasoning",
+  "version": 1,
+  "description": "Short logic, sequence and code-reading problems with one right answer.",
+  "tasks": [
+    {
+      "id": "reason-001",
+      "title": "Ordering",
+      "prompt": "Ann is taller than Bo. Bo is taller than Cy. Dee is shorter than Cy. Who is the shortest?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)\\bDee\\b"
+        },
+        {
+          "type": "not_regex",
+          "pattern": "(?i)shortest[^.]*\\bCy\\b"
+        }
+      ],
+      "rubric": "Dee is shortest.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-002",
+      "title": "Invalid inference",
+      "prompt": "All widgets are gadgets. Some gadgets are blue. Can we conclude that some widgets are blue? Answer yes or no, then explain in one sentence.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)\\b(no|cannot|can't|not necessarily)\\b"
+        },
+        {
+          "type": "not_regex",
+          "pattern": "(?i)\\A\\s*yes"
+        }
+      ],
+      "rubric": "Correct answer: no. The blue gadgets may not include any widgets.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-003",
+      "title": "Overlapping meetings",
+      "prompt": "Meeting P runs 09:00-10:00, meeting Q runs 09:45-10:30, meeting R runs 10:30-11:00. Which two meetings overlap?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)\\bP\\b.*\\bQ\\b|\\bQ\\b.*\\bP\\b"
+        },
+        {
+          "type": "not_regex",
+          "pattern": "(?i)all three"
+        }
+      ],
+      "rubric": "P and Q overlap. R starts exactly when Q ends, so no overlap with R.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-004",
+      "title": "Day of week",
+      "prompt": "Today is Wednesday. What day of the week will it be 10 days from now?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)saturday"
+        }
+      ],
+      "rubric": "10 days is one week plus 3 days: Saturday.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-005",
+      "title": "Next in sequence",
+      "prompt": "What number comes next: 2, 6, 18, 54, ...?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 162,
+          "tol": 0.01
+        }
+      ],
+      "rubric": "Each term is multiplied by 3, so 162.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-006",
+      "title": "Read the code",
+      "prompt": "What does this Python program print?\n\ntotal = 0\nfor i in range(1, 5):\n    total += i * i\nprint(total)",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 30,
+          "tol": 0.01
+        }
+      ],
+      "rubric": "1 + 4 + 9 + 16 = 30.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-007",
+      "title": "Spot the failure",
+      "prompt": "What happens when this Python program runs and why?\n\ndef average(values):\n    return sum(values) / len(values)\n\nprint(average([]))",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)zerodivision|divide by zero|division by zero"
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)empty"
+        }
+      ],
+      "rubric": "It raises ZeroDivisionError because the list is empty so len is 0.",
+      "weight": 1.0
+    },
+    {
+      "id": "reason-008",
+      "title": "Bat and ball",
+      "prompt": "A bat and a ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost, in dollars?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 0.05,
+          "tol": 0.001
+        },
+        {
+          "type": "not_regex",
+          "pattern": "\\$?0?\\.10\\b(?!.*0\\.05)"
+        }
+      ],
+      "rubric": "The ball costs 5 cents. A common wrong answer is 10 cents.",
+      "weight": 1.0
+    }
+  ]
+}

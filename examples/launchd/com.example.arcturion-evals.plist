@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Template: run a slice of the eval suites once a night at 02:30 on macOS.
+     Replace every /path/to/... placeholder, then:
+       cp com.example.arcturion-evals.plist ~/Library/LaunchAgents/
+       launchctl bootstrap gui/$UID ~/Library/LaunchAgents/com.example.arcturion-evals.plist
+     To change it later: bootout, edit, bootstrap. Don't edit a loaded plist in place.
+     Keep log files outside folders that macOS privacy controls protect (for example Documents). -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.example.arcturion-evals</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>-m</string>
+    <string>arcturion_evals</string>
+    <string>run</string>
+    <string>--slice</string><string>15</string>
+  </array>
+  <key>WorkingDirectory</key><string>/path/to/arcturion-evals</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>EVALS_AGENT_CMD</key><string>/path/to/your-agent-wrapper</string>
+    <key>EVALS_STATE_DIR</key><string>/path/to/evals-state</string>
+    <!-- Optional judge. Put the key in your own secret store and export it in the wrapper;
+         do not write a key into this file. -->
+    <key>EVALS_JUDGE</key><string>none</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>30</integer></dict>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/path/to/logs/arcturion-evals.out</string>
+  <key>StandardErrorPath</key><string>/path/to/logs/arcturion-evals.err</string>
+</dict></plist>

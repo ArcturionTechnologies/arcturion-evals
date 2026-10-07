@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arcturion-evals"
+version = "0.1.0"
+description = "Golden-task eval harness for AI agents: deterministic checks plus an optional pluggable LLM judge, rotating runs and a trend dashboard"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Arcturion Technologies"}]
+
+[project.scripts]
+arcturion-evals = "arcturion_evals.cli:main"
+
+[tool.setuptools]
+packages = ["arcturion_evals"]

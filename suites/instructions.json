@@ -1,0 +1,150 @@
+{
+  "suite": "instructions",
+  "version": 1,
+  "description": "Follow explicit format and length constraints exactly.",
+  "tasks": [
+    {
+      "id": "follow-001",
+      "title": "Exactly three bullets",
+      "prompt": "Give exactly three bullet points on why unit tests help a project. Start each with '- '. Output nothing except the three bullets.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "\\A(?:[-*] [^\\n]+\\n){2}[-*] [^\\n]+\\n?\\Z"
+        }
+      ],
+      "rubric": "Exactly three bullets and no other text.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-002",
+      "title": "Lowercase single sentence",
+      "prompt": "In one sentence written entirely in lowercase letters, say why sleep matters.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "not_regex",
+          "pattern": "[A-Z]"
+        },
+        {
+          "type": "regex",
+          "pattern": "\\A[^.!?\\n]+[.!?]?\\s*\\Z"
+        }
+      ],
+      "rubric": "One sentence, no capital letters.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-003",
+      "title": "One word reply",
+      "prompt": "Reply with only the single word: ready",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "\\A\\s*ready\\.?\\s*\\Z",
+          "flags": "i"
+        }
+      ],
+      "rubric": "Only the word ready, nothing else.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-004",
+      "title": "JSON only",
+      "prompt": "Return a JSON object with two keys: name set to \"sample\" and count set to 7. Output JSON only, with no code fences and no commentary.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "json_field",
+          "path": "name",
+          "equals": "sample"
+        },
+        {
+          "type": "json_field",
+          "path": "count",
+          "equals": 7
+        },
+        {
+          "type": "not_contains",
+          "value": "```"
+        }
+      ],
+      "rubric": "A bare JSON object, no fences, no commentary.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-005",
+      "title": "Three lines",
+      "prompt": "Write a three-line poem about autumn. Exactly three lines, no title, no blank lines.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "\\A[^\\n]+\\n[^\\n]+\\n[^\\n]+\\n?\\Z"
+        }
+      ],
+      "rubric": "Exactly three non-empty lines.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-006",
+      "title": "Avoid a letter",
+      "prompt": "Write two sentences about rain. Include the word umbrella and do not use the letter z anywhere.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?i)umbrella"
+        },
+        {
+          "type": "not_regex",
+          "pattern": "(?i)z"
+        }
+      ],
+      "rubric": "Contains umbrella; contains no letter z.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-007",
+      "title": "Numbered steps",
+      "prompt": "Give exactly four numbered steps (1. to 4.) for making tea. No fifth step, no intro.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "(?m)^1\\."
+        },
+        {
+          "type": "regex",
+          "pattern": "(?m)^4\\."
+        },
+        {
+          "type": "not_regex",
+          "pattern": "(?m)^5\\."
+        }
+      ],
+      "rubric": "Four numbered steps only.",
+      "weight": 1.0
+    },
+    {
+      "id": "follow-008",
+      "title": "Word limit",
+      "prompt": "Explain what a database index is in at most 20 words.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "max_words",
+          "value": 20
+        },
+        {
+          "type": "regex",
+          "pattern": "(?i)index"
+        }
+      ],
+      "rubric": "Accurate explanation within 20 words.",
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "suite": "arithmetic",
+  "version": 1,
+  "description": "Exact arithmetic and unit work with every number supplied in the prompt.",
+  "tasks": [
+    {
+      "id": "arith-001",
+      "title": "Invoice total with tax",
+      "prompt": "A shop sells 12 notebooks at $8.50 each and 5 binders at $14.20 each. Sales tax is 8% of the subtotal. What is the subtotal, the tax, and the grand total? Show the three numbers.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 173.0,
+          "tol": 0.01
+        },
+        {
+          "type": "number_close",
+          "expect": 13.84,
+          "tol": 0.01
+        },
+        {
+          "type": "number_close",
+          "expect": 186.84,
+          "tol": 0.01
+        }
+      ],
+      "rubric": "Subtotal 173.00, tax 13.84, total 186.84. Score on all three being correct.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-002",
+      "title": "Percentage change",
+      "prompt": "A subscription plan cost $80 per month last year and costs $92 per month now. By what percentage did the price increase? Give a single percentage.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 15.0,
+          "tol": 0.05
+        }
+      ],
+      "rubric": "The increase is 12 on a base of 80, which is 15 percent.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-003",
+      "title": "Average of five scores",
+      "prompt": "Five quiz scores are 72, 85, 91, 64 and 88. What is the mean score?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 80.0,
+          "tol": 0.05
+        }
+      ],
+      "rubric": "Sum is 400, mean is 80.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-004",
+      "title": "Unit conversion",
+      "prompt": "Convert 3.5 kilometres to metres and 2.25 hours to minutes. Give both results.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 3500,
+          "tol": 0.01
+        },
+        {
+          "type": "number_close",
+          "expect": 135,
+          "tol": 0.01
+        }
+      ],
+      "rubric": "3500 metres and 135 minutes.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-005",
+      "title": "Compound growth",
+      "prompt": "A deposit of $1,000 earns 5% interest per year, compounded once per year. What is the balance after 3 years, rounded to the nearest cent?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 1157.63,
+          "tol": 0.01
+        }
+      ],
+      "rubric": "1000 * 1.05^3 = 1157.625, so 1157.63.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-006",
+      "title": "Combined work rate",
+      "prompt": "One packing machine fills 40 boxes per hour and a second fills 25 boxes per hour. Working together at those constant rates, how many hours do they need to fill 390 boxes?",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 6.0,
+          "tol": 0.05
+        }
+      ],
+      "rubric": "Combined rate 65 per hour; 390 / 65 = 6 hours.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-007",
+      "title": "Stacked discounts",
+      "prompt": "An item is listed at $250. A 20% discount is applied first, then an extra 10% is taken off the discounted price. What is the final price? Note that this is not the same as a flat 30% off.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "number_close",
+          "expect": 180.0,
+          "tol": 0.01
+        },
+        {
+          "type": "not_contains",
+          "value": "175"
+        }
+      ],
+      "rubric": "Correct is 250 * 0.8 * 0.9 = 180. Score zero if the answer is 175.",
+      "weight": 1.0
+    },
+    {
+      "id": "arith-008",
+      "title": "Clock arithmetic",
+      "prompt": "A workshop starts at 9:45 and runs for 2 hours 50 minutes. At what time does it end? Use a 24-hour clock.",
+      "timeout_s": 120,
+      "checks": [
+        {
+          "type": "regex",
+          "pattern": "\\b12:35\\b"
+        }
+      ],
+      "rubric": "9:45 plus 2:50 is 12:35.",
+      "weight": 1.0
+    }
+  ]
+}
