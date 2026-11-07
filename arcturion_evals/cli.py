@@ -10,7 +10,7 @@ from .config import Config, DEFAULT_SLICE
 
 def build_parser():
     ap = argparse.ArgumentParser(prog="arcturion-evals", description="ArcturionEvals: golden-task eval harness")
-    ap.add_argument("--suites-dir", help="folder of suite JSON files (env EVALS_SUITES_DIR, default ./suites)")
+    ap.add_argument("--suites-dir", help="folder of suite JSON files (env EVALS_SUITES_DIR, default ./suites if present, else bundled suites)")
     ap.add_argument("--state-dir", help="history/rotation/receipt folder (env EVALS_STATE_DIR, default ./evals-state)")
     ap.add_argument("--workdir", help="working directory for the agent command (env EVALS_WORKDIR)")
     ap.add_argument("--agent-cmd", help="command that runs the agent; prompt on stdin, answer on stdout (env EVALS_AGENT_CMD)")
@@ -39,7 +39,11 @@ def main(argv=None, environ=None):
     if args.cmd == "run":
         return runner.cmd_run(cfg, args.slice, args.dry_run, args.suite, args.task)
     if args.cmd == "list":
-        for name, task in runner.load_suites(cfg):
+        tasks = runner.load_suites(cfg)
+        if not tasks:
+            print("No tasks found in %s" % cfg.suites_dir, file=sys.stderr)
+            return 1
+        for name, task in tasks:
             print("%s/%s\t%s" % (name, task.get("id"), task.get("title", "")))
         return 0
     if args.cmd == "dashboard":

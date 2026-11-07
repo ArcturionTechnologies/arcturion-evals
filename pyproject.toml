@@ -15,4 +15,12 @@ authors = [{name = "Arcturion Technologies"}]
 arcturion-evals = "arcturion_evals.cli:main"
 
 [tool.setuptools]
-packages = ["arcturion_evals"]
+packages = ["arcturion_evals", "arcturion_evals.suites", "arcturion_evals.examples"]
+
+[tool.setuptools.package-dir]
+"arcturion_evals.suites" = "suites"
+"arcturion_evals.examples" = "examples"
+
+[tool.setuptools.package-data]
+"arcturion_evals.suites" = ["*.json"]
+"arcturion_evals.examples" = ["replay_answers.json"]

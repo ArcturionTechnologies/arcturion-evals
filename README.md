@@ -24,7 +24,7 @@ python3 -m arcturion_evals list | head -3
 # ...
 
 # Try the full path offline with a stand-in agent that replays recorded answers.
-python3 -m arcturion_evals --agent-cmd "python3 examples/replay_agent.py" run --slice 48
+EVALS_JUDGE=none EVALS_NOTIFY_CMD= python3 -m arcturion_evals --agent-cmd "python3 examples/replay_agent.py" run --slice 48
 # run d2f2556b done: mean 10.00 over 48 task(s) -> evals-state/history/<date>_<run>.jsonl
 
 python3 -m arcturion_evals dashboard    # evals-state/dashboard.html
@@ -39,7 +39,14 @@ export EVALS_AGENT_CMD="/path/to/your-agent-wrapper"
 python3 -m arcturion_evals run --slice 15
 ```
 
-Or install it as a command: `pip install .`, then run `arcturion-evals ...`.
+Or install it as a command: `pip install .`, then run from any directory:
+
+```bash
+arcturion-evals list
+EVALS_JUDGE=none EVALS_NOTIFY_CMD= arcturion-evals --agent-cmd "python3 -I -m arcturion_evals.examples.replay_agent" run --slice 48
+```
+
+The installed replay command uses recorded synthetic answers; it does not evaluate a model. Activate the same environment where you installed the package so `python3` finds it. The `-I` flag prevents a source checkout from shadowing the installed replay module.
 
 ## What is in the box
 
@@ -55,7 +62,7 @@ and every task has at least one exact, automatic check.
 | `summarization` | faithful summaries and rewrites | no invented figures, flag conflicting sources |
 | `boundaries` | safe, honest behavior | confirm before deleting, ignore text injected into data, admit missing data |
 
-Add your own by dropping a JSON file in `suites/` (schema in [docs/DESIGN.md](docs/DESIGN.md)).
+To use your own suites, put JSON files in a directory and pass `--suites-dir /path/to/suites` (schema in [docs/DESIGN.md](docs/DESIGN.md)). The specified directory replaces the default suites. If no override is set, an existing `./suites` is used, even if empty; otherwise the bundled synthetic suites are used. An empty or missing selected directory makes `list` fail.
 Keep answers stable over time: frozen facts and exact math, never live state.
 
 ## How scoring works
@@ -92,7 +99,7 @@ Flags win over environment variables, which win over defaults.
 
 | Flag | Environment | Default |
 | --- | --- | --- |
-| `--suites-dir` | `EVALS_SUITES_DIR` | `./suites` |
+| `--suites-dir` | `EVALS_SUITES_DIR` | `./suites` if present, otherwise bundled synthetic suites |
 | `--state-dir` | `EVALS_STATE_DIR` | `./evals-state` |
 | `--agent-cmd` | `EVALS_AGENT_CMD` | none (required to run for real) |
 | `--workdir` | `EVALS_WORKDIR` | current directory |

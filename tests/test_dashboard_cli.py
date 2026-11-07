@@ -6,8 +6,9 @@ import os
 import sys
 import unittest
 from unittest.mock import patch
+from pathlib import Path
 from helpers import TempCase, ROOT, under
-from arcturion_evals import cli, dashboard as dash
+from arcturion_evals import cli, runner, dashboard as dash
 from arcturion_evals.config import Config
 
 
@@ -76,11 +77,31 @@ class TestConfig(TempCase):
         cfg = Config.from_env(env, state_dir="/flag/state", agent_cmd="other-agent")
         self.assertEqual((str(cfg.state_dir), cfg.agent_cmd), ("/flag/state", ["other-agent"]))
 
-    def test_defaults_are_relative_not_absolute_machine_paths(self):
+    def test_defaults_use_bundled_suites_and_relative_state(self):
         cfg = Config.from_env({})
-        self.assertFalse(cfg.suites_dir.is_absolute())
+        self.assertEqual(cfg.suites_dir, Path("suites"))
+        self.assertEqual(len(runner.load_suites(cfg)), 48)
         self.assertFalse(cfg.state_dir.is_absolute())
         self.assertIsNone(cfg.agent_cmd)
+
+    def test_local_suites_precedence_and_installed_fallback(self):
+        previous = os.getcwd()
+        try:
+            work = self.root / "empty-work"
+            work.mkdir()
+            os.chdir(work)
+            self.assertEqual(Config.from_env({}).suites_dir, ROOT / "suites")
+            Path("suites").mkdir(exist_ok=True)
+            self.assertEqual(Config.from_env({}).suites_dir, Path("suites"))
+            self.assertEqual(Config.from_env({"EVALS_SUITES_DIR": "env-dir"}).suites_dir, Path("env-dir"))
+            self.assertEqual(Config.from_env({"EVALS_SUITES_DIR": "env-dir"}, suites_dir="flag-dir").suites_dir, Path("flag-dir"))
+        finally:
+            os.chdir(previous)
+
+    def test_offline_environment_disables_judge_and_notification(self):
+        cfg = Config.from_env({"EVALS_JUDGE": "none", "EVALS_NOTIFY_CMD": ""})
+        self.assertIsNone(cfg.judge)
+        self.assertIsNone(cfg.notify_cmd)
 
     def test_derived_paths_live_under_state_dir(self):
         cfg = self.config()
@@ -94,6 +115,22 @@ class TestCli(TempCase):
         with contextlib.redirect_stdout(out):
             code = cli.main(list(argv), environ=env or {})
         return code, out.getvalue()
+
+    def test_list_missing_custom_suites_fails_instead_of_falling_back(self):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code, output = self.run_cli('--suites-dir', str(self.root / 'absent'), 'list')
+        self.assertEqual(code, 1)
+        self.assertIn('No tasks found', err.getvalue())
+        self.assertEqual(output, '')
+
+    def test_list_custom_suites_replaces_bundled_suites(self):
+        self.suites.mkdir(exist_ok=True)
+        (self.suites / 'custom.json').write_text(json.dumps({'suite': 'custom', 'tasks': [{'id': 'only', 'title': 'Custom'}]}))
+        code, output = self.run_cli('--suites-dir', str(self.suites), 'list')
+        self.assertEqual(code, 0)
+        self.assertIn('custom/only', output)
+        self.assertNotIn('arith-001', output)
 
     def base(self):
         return ["--suites-dir", str(ROOT / "suites"), "--state-dir", str(self.state)]

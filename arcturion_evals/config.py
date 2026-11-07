@@ -2,7 +2,7 @@
 
 Resolution order for each setting: explicit argument, then environment variable, then default.
 
-    EVALS_SUITES_DIR   folder of suite JSON files            default ./suites
+    EVALS_SUITES_DIR   folder of suite JSON files            default ./suites when present, else bundled suites
     EVALS_STATE_DIR    history, rotation pointer, receipts   default ./evals-state
     EVALS_WORKDIR      working directory for the agent       default: the current directory
     EVALS_AGENT_CMD    command that runs the agent under test (prompt arrives on stdin)
@@ -20,6 +20,22 @@ DEFAULT_SLICE = 15
 DEFAULT_TIMEOUT_S = 300
 
 
+def bundled_suites_dir():
+    """Find the same suites in a source checkout or an installed distribution."""
+    package_dir = Path(__file__).resolve().parent
+    installed = package_dir / "suites"
+    if installed.is_dir():
+        return installed
+    source_root = package_dir.parent
+    return source_root / "suites" if (source_root / "pyproject.toml").is_file() else installed
+
+
+def default_suites_dir():
+    """Preserve project-local suites when present, even if the folder is empty."""
+    local = Path("suites")
+    return local if os.path.lexists(local) else bundled_suites_dir()
+
+
 def _split(value):
     if not value:
         return None
@@ -29,7 +45,7 @@ def _split(value):
 
 @dataclass
 class Config:
-    suites_dir: Path = Path("suites")
+    suites_dir: Path = field(default_factory=default_suites_dir)
     state_dir: Path = Path("evals-state")
     workdir: Path | None = None
     agent_cmd: list | None = None
@@ -73,7 +89,7 @@ class Config:
         if isinstance(notify_cmd, str):
             notify_cmd = _split(notify_cmd)
         return cls(
-            suites_dir=pick("suites_dir", "EVALS_SUITES_DIR", Path("suites"), Path),
+            suites_dir=pick("suites_dir", "EVALS_SUITES_DIR", default_suites_dir(), Path),
             state_dir=pick("state_dir", "EVALS_STATE_DIR", Path("evals-state"), Path),
             workdir=pick("workdir", "EVALS_WORKDIR", None, Path),
             agent_cmd=agent_cmd or _split(env.get("EVALS_AGENT_CMD")),
