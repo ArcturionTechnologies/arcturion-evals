@@ -137,7 +137,7 @@ arcturion_evals/    checks, judge, config, runner, dashboard, style report, inta
 suites/             the 48 synthetic tasks
 examples/           replay agent and its recorded answers, launchd template
 docs/DESIGN.md      schema, scoring and state details
-tests/              89 tests, stdlib unittest
+tests/              Regression checks, stdlib unittest
 ```
 
 ## Tests
